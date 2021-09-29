@@ -395,6 +395,7 @@ RCT_EXPORT_METHOD(updatePhoneNumber
                   : (NSString *)authSecret
                   : (RCTPromiseResolveBlock)resolve
                   : (RCTPromiseRejectBlock)reject) {
+#if !TARGET_OS_TV               
   FIRUser *user = [FIRAuth authWithApp:firebaseApp].currentUser;
 
   if (user) {
@@ -426,6 +427,7 @@ RCT_EXPORT_METHOD(updatePhoneNumber
   } else {
     [self promiseNoUser:resolve rejecter:reject isError:YES];
   }
+#endif
 }
 
 RCT_EXPORT_METHOD(updateProfile
@@ -714,6 +716,7 @@ RCT_EXPORT_METHOD(signInWithPhoneNumber
                   : (NSString *)phoneNumber
                   : (RCTPromiseResolveBlock)resolve
                   : (RCTPromiseRejectBlock)reject) {
+#if !TARGET_OS_TV
   [[FIRPhoneAuthProvider providerWithAuth:[FIRAuth authWithApp:firebaseApp]]
       verifyPhoneNumber:phoneNumber
              UIDelegate:nil
@@ -726,12 +729,14 @@ RCT_EXPORT_METHOD(signInWithPhoneNumber
                  resolve(@{@"verificationId" : verificationID});
                }
              }];
+#endif
 }
 
 RCT_EXPORT_METHOD(verifyPhoneNumber
                   : (FIRApp *)firebaseApp
                   : (NSString *)phoneNumber
                   : (NSString *)requestKey) {
+#if !TARGET_OS_TV
   [[FIRPhoneAuthProvider providerWithAuth:[FIRAuth authWithApp:firebaseApp]]
       verifyPhoneNumber:phoneNumber
              UIDelegate:nil
@@ -759,6 +764,7 @@ RCT_EXPORT_METHOD(verifyPhoneNumber
                                                body:body];
                }
              }];
+#endif
 }
 
 RCT_EXPORT_METHOD(confirmationResultConfirm
@@ -766,6 +772,7 @@ RCT_EXPORT_METHOD(confirmationResultConfirm
                   : (NSString *)verificationCode
                   : (RCTPromiseResolveBlock)resolve
                   : (RCTPromiseRejectBlock)reject) {
+#if !TARGET_OS_TV
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   NSString *verificationId = [defaults stringForKey:@"authVerificationID"];
 
@@ -782,6 +789,7 @@ RCT_EXPORT_METHOD(confirmationResultConfirm
                     [self promiseWithAuthResult:resolve rejecter:reject authResult:authResult];
                   }
                 }];
+#endif
 }
 
 RCT_EXPORT_METHOD(linkWithCredential
@@ -963,9 +971,11 @@ RCT_EXPORT_METHOD(useEmulator
     credential = [FIREmailAuthProvider credentialWithEmail:authToken link:authTokenSecret];
   } else if ([provider compare:@"github.com" options:NSCaseInsensitiveSearch] == NSOrderedSame) {
     credential = [FIRGitHubAuthProvider credentialWithToken:authToken];
+#if !TARGET_OS_TV
   } else if ([provider compare:@"phone" options:NSCaseInsensitiveSearch] == NSOrderedSame) {
     credential = [[FIRPhoneAuthProvider provider] credentialWithVerificationID:authToken
                                                               verificationCode:authTokenSecret];
+#endif
   } else if ([provider compare:@"oauth" options:NSCaseInsensitiveSearch] == NSOrderedSame) {
     credential = [FIROAuthProvider credentialWithProviderID:@"oauth"
                                                     IDToken:authToken
